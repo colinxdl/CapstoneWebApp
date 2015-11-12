@@ -1,0 +1,95 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+
+  <title>My Parse App</title>
+  <meta name="description" content="My Parse App">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-latest.js"></script>
+</head>
+
+<body>
+  
+  <div id="main">
+    <h1>You're ready to use Layover Box!</h1>
+
+	<form id="post-form">
+		<p><input id="post-LayoverBoxAddress" type="text"></p>
+		<p><input id="post-submit" type="submit"></p>
+	</form>
+	
+	<ul id="list-posts">
+		<!-- list of posts 
+		     <li>
+				<H3>Title
+				<p>Content
+		-->
+	</ul>
+    
+  </div>
+
+  <script type="text/javascript">
+    Parse.initialize("b6YxM8o38EKm9YXg2HMYFKybLvNnPj1lJEfllTow", "G1sREncEGWk9K4cD4E259ycHLKOeYOT7lQbYPMr9");
+    
+    var Post = Parse.Object.extend("Post");
+    
+	function getPosts() {
+	    //query actually returns an array of parse objects
+		var query = new Parse.Query(Post);
+		query.find({
+			success: function(results){
+				var output = "";
+				for (var i in results){
+					var LayoverBoxAddress = results[i].get("LayoverBoxAddress");
+					var SmallCubbyAvailable = results[i].get("SmallCubbyAvailable");
+					var MediumCubbyAvailable = results[i].get("MediumCubbyAvailable");
+					var LargeCubbyAvailable = results[i].get("LargeCubbyAvailable");
+					//console.log("Layover Box Address: "+LayoverBoxAddress);
+					//console.log("Small Cubby Available: "+SmallCubbyAvailable);
+					//console.log("Medium Cubby Available: "+MediumCubbyAvailable);
+					//console.log("Large Cubby Available: "+LargeCubbyAvailable);
+					output += "<li>";
+					output += "<h3>"+"Layover Box Address: "+LayoverBoxAddress+"</h3>";
+					output += "<p>"+"Small Cubby Available: "+SmallCubbyAvailable+"</p>";
+					output += "<p>"+"Medium Cubby Available: "+MediumCubbyAvailable+"</p>";
+					output += "<p>"+"Large Cubby Available: "+LargeCubbyAvailable+"</p>";
+                    output += "</li>";					
+				}
+				//set html to the output string that we generated in the for loop
+				$("#list-posts").html(output);
+			}, error: function(error){
+				console.log("Query Error:"+error.message);
+			}
+		});
+	}
+	
+	getPosts();
+	
+	$("#post-form").submit(function(event){
+		// prevent refresh the web page.
+		event.preventDefault();
+		
+		var LayoverBoxAddress = $("#post-LayoverBoxAddress").val();
+		var newPost = new Post();
+		newPost.set("LayoverBoxAddress", LayoverBoxAddress);
+		newPost.set("SmallCubbyAvailable", 0);
+		newPost.set("MediumCubbyAvailable", 5);
+		newPost.set("LargeCubbyAvailable", 3);
+	
+		newPost.save({
+			success: function(){
+				getPosts();
+			},
+			error: function(error){
+									console.log("Error:"+error.message);
+			}
+		});
+	});
+	
+  </script>
+</body>
+
+</html>
